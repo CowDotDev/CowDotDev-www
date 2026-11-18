@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cow.dev/sitemap-index.xml

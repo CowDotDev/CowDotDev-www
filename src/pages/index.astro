@@ -1,0 +1,147 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Spots from '../components/brand/Spots.astro';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import PostList from '../components/ui/PostList.astro';
+import { site } from '../lib/site';
+import { getPosts } from '../lib/posts';
+
+const latest = (await getPosts()).slice(0, 3);
+const github = site.social.find((s) => s.label === 'GitHub');
+---
+
+<BaseLayout>
+  <section class="hero container">
+    <div class="intro">
+      <p class="eyebrow">Software developer</p>
+      <h1>
+        Hi, I'm <span class="name">{site.name}</span>.<br />I build things for the web.
+      </h1>
+      <p class="lede">{site.tagline}</p>
+      <div class="actions">
+        <Button href="/about">About me</Button>
+        <Button href="/blog" variant="secondary">
+          Read the blog
+        </Button>
+        {github && (
+          <Button href={github.href} variant="secondary" external>
+            GitHub ↗
+          </Button>
+        )}
+      </div>
+    </div>
+    <div class="hide" aria-hidden="true">
+      <Spots seed={7} count={5} width={400} height={400} minSize={0.14} maxSize={0.24} />
+    </div>
+  </section>
+
+  <section class="container explore" aria-labelledby="explore-heading">
+    <h2 id="explore-heading" class="visually-hidden">
+      Explore
+    </h2>
+    <div class="grid">
+      <Card href="/about" eyebrow="Bio" title="About me">
+        Who I am, what I've worked on, and the tools I reach for.
+      </Card>
+      <Card href="/blog" eyebrow="Writing" title="The blog">
+        Notes on code, craft, and whatever I'm chewing on this week.
+      </Card>
+    </div>
+  </section>
+
+  <section class="container latest" aria-labelledby="latest-heading">
+    <div class="section-head">
+      <h2 id="latest-heading">Latest writing</h2>
+      <a href="/blog">All posts →</a>
+    </div>
+    <PostList posts={latest} headingLevel="h3" />
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-12);
+    padding-block: var(--space-24) var(--space-16);
+  }
+  h1 {
+    margin-top: var(--space-4);
+    font-size: var(--text-4xl);
+    font-weight: 800;
+  }
+  .name {
+    color: var(--color-accent);
+  }
+  .lede {
+    margin-top: var(--space-6);
+    font-size: var(--text-lg);
+    color: var(--color-fg-muted);
+    max-width: 40ch;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+  .hide {
+    aspect-ratio: 1;
+    width: 100%;
+    max-width: 22rem;
+    justify-self: end;
+    overflow: hidden;
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-fg);
+    border-radius: var(--radius-blob);
+    box-shadow: 8px 8px 0 0 var(--color-fg);
+    animation: wobble 9s var(--ease-out) infinite alternate;
+  }
+  .hide :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+  @keyframes wobble {
+    from {
+      border-radius: var(--radius-blob);
+      transform: rotate(-2deg);
+    }
+    to {
+      border-radius: 45% 55% 42% 58% / 55% 45% 58% 42%;
+      transform: rotate(2deg);
+    }
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--space-8);
+  }
+  .latest {
+    margin-top: var(--space-24);
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+  .section-head h2 {
+    font-size: var(--text-2xl);
+  }
+  @media (max-width: 48rem) {
+    .hero {
+      grid-template-columns: 1fr;
+      padding-block: var(--space-12);
+      gap: var(--space-8);
+    }
+    .hide {
+      order: -1;
+      max-width: 9rem;
+      justify-self: start;
+      box-shadow: 5px 5px 0 0 var(--color-fg);
+    }
+  }
+</style>

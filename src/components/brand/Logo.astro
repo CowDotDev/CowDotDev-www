@@ -1,0 +1,61 @@
+---
+interface Props {
+  href?: string;
+}
+const { href = '/' } = Astro.props;
+---
+
+<a class="logo" href={href} aria-label="cow.dev — home">
+  <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+    <rect x="1" y="1" width="30" height="30" rx="9" class="hide"></rect>
+    <path
+      class="spot"
+      d="M6.5 7.5c3-2.6 7.8-1.6 9 1.4 1 2.6-1.1 4.4-3.6 5.2-2.7.9-5.6.2-6.4-1.9-.6-1.6-.3-3.4 1-4.7Z"
+    ></path>
+    <path
+      class="spot"
+      d="M19.4 15.8c2.6-1.4 6.3-.5 7.1 2.1.8 2.6-.5 5.8-3.4 6.6-2.7.7-5.3-.8-5.6-3.3-.2-2.1.3-4.3 1.9-5.4Z"
+    ></path>
+    <circle class="spot" cx="9.5" cy="23.5" r="2.4"></circle>
+  </svg>
+  <span class="word">
+    cow<span class="dot">.</span>dev
+  </span>
+</a>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-fg);
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--text-lg);
+    letter-spacing: var(--tracking-tight);
+    min-height: 40px;
+  }
+  .logo:hover {
+    color: var(--color-fg);
+  }
+  .mark {
+    width: 30px;
+    height: 30px;
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+  .logo:hover .mark {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  .hide {
+    fill: var(--color-surface);
+    stroke: var(--color-fg);
+    stroke-width: 2;
+  }
+  .spot {
+    fill: var(--color-fg);
+  }
+  .dot {
+    color: var(--color-accent);
+  }
+</style>

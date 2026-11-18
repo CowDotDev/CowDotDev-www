@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/ui/PostList.astro';
+import Tag from '../../components/ui/Tag.astro';
+import { getPosts, getTags, tagSlug } from '../../lib/posts';
+
+const posts = await getPosts();
+const tags = await getTags();
+---
+
+<BaseLayout title="Writing" description="Notes on code, craft, and the things I build.">
+  <section class="container page">
+    <header class="head">
+      <p class="eyebrow">Writing</p>
+      <h1>The blog</h1>
+      <p class="lede">
+        Notes on code, craft, and whatever I'm chewing on. Subscribe via <a href="/rss.xml">RSS</a>.
+      </p>
+      {tags.length > 0 && (
+        <div class="tags" aria-label="Topics">
+          {tags.map(({ tag, count }) => (
+            <Tag tag={`${tag} (${count})`} href={`/tags/${tagSlug(tag)}`} />
+          ))}
+        </div>
+      )}
+    </header>
+    <PostList posts={posts} />
+  </section>
+</BaseLayout>
+
+<style>
+  .page {
+    max-width: 56rem;
+    padding-block: var(--space-16);
+  }
+  .head {
+    margin-bottom: var(--space-12);
+  }
+  h1 {
+    margin-top: var(--space-2);
+    font-size: var(--text-4xl);
+    font-weight: 800;
+  }
+  .lede {
+    margin-top: var(--space-4);
+    font-size: var(--text-lg);
+    color: var(--color-fg-muted);
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-6);
+  }
+</style>

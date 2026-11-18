@@ -1,0 +1,351 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Spots from '../components/brand/Spots.astro';
+import Tag from '../components/ui/Tag.astro';
+import { site } from '../lib/site';
+import { intro, experience, skills, projects } from '../data/bio';
+---
+
+<BaseLayout title="About" description={`About ${site.name}: experience, skills, and projects.`}>
+  <article class="about container">
+    <header class="head">
+      <div>
+        <p class="eyebrow">About</p>
+        <h1>{site.name}</h1>
+        <p class="role">Software developer</p>
+      </div>
+      <div class="avatar" aria-hidden="true">
+        <Spots seed={3} count={4} width={200} height={200} minSize={0.16} maxSize={0.26} />
+      </div>
+    </header>
+
+    <section class="intro" aria-label="Introduction">
+      {intro.map((p) => (
+        <p>{p}</p>
+      ))}
+      <ul class="links">
+        {site.social
+          .filter((s) => s.href.startsWith('http'))
+          .map((s) => (
+            <li>
+              <a href={s.href} rel="me noopener">
+                {s.label} <span class="print-url">{s.href.replace(/^https?:\/\//, '')}</span>
+              </a>
+            </li>
+          ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="experience">
+      <h2 id="experience">Experience</h2>
+      <ol class="timeline">
+        {experience.map((role) => (
+          <li class="role-item">
+            <p class="eyebrow when">
+              {role.start} – {role.end ?? 'Present'}
+              {role.location && <span> · {role.location}</span>}
+            </p>
+            <h3>
+              {role.title} <span class="at">@</span>{' '}
+              {role.url ? <a href={role.url}>{role.company}</a> : role.company}
+            </h3>
+            <p class="summary">{role.summary}</p>
+            {role.highlights && (
+              <ul class="highlights">
+                {role.highlights.map((h) => (
+                  <li>{h}</li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section aria-labelledby="skills">
+      <h2 id="skills">Skills</h2>
+      <dl class="skills">
+        {skills.map((group) => (
+          <div class="skill-group">
+            <dt>{group.label}</dt>
+            <dd>
+              <ul>
+                {group.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section aria-labelledby="projects">
+      <h2 id="projects">Selected projects</h2>
+      <ul class="projects">
+        {projects.map((p) => (
+          <li class="project">
+            <h3>{p.url ? <a href={p.url}>{p.name}</a> : p.name}</h3>
+            <p>{p.description}</p>
+            <div class="project-meta">
+              {p.tags.map((t) => (
+                <Tag tag={t} />
+              ))}
+              {p.repo && (
+                <a class="repo" href={p.repo} rel="noopener">
+                  Source ↗
+                </a>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <p class="print-hint">
+      <button type="button" class="print-btn" onclick="window.print()">
+        Print / save as PDF
+      </button>
+    </p>
+  </article>
+</BaseLayout>
+
+<style>
+  .about {
+    max-width: 52rem;
+    padding-block: var(--space-16);
+  }
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+  }
+  h1 {
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    margin-top: var(--space-2);
+  }
+  .role {
+    color: var(--color-fg-muted);
+    font-size: var(--text-lg);
+  }
+  .avatar {
+    flex: none;
+    width: clamp(6rem, 18vw, 9rem);
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-fg);
+    border-radius: var(--radius-blob);
+    box-shadow: var(--shadow-sticker);
+  }
+  .avatar :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+  section {
+    margin-top: var(--space-16);
+  }
+  h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  h2::before {
+    content: '';
+    width: 0.7em;
+    height: 0.55em;
+    background: var(--color-fg);
+    border-radius: var(--radius-blob);
+    flex: none;
+  }
+  .intro {
+    margin-top: var(--space-12);
+    font-size: var(--text-lg);
+    display: grid;
+    gap: var(--space-4);
+    max-width: var(--measure);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    list-style: none;
+    padding: 0;
+    font-size: var(--text-base);
+  }
+  .print-url {
+    display: none;
+  }
+  .timeline {
+    list-style: none;
+    padding: 0;
+    border-left: var(--border-width) solid var(--color-fg);
+    margin-left: var(--space-2);
+  }
+  .role-item {
+    position: relative;
+    padding: 0 0 var(--space-8) var(--space-8);
+  }
+  .role-item::before {
+    content: '';
+    position: absolute;
+    left: -9px;
+    top: 0.3em;
+    width: 16px;
+    height: 13px;
+    background: var(--color-fg);
+    border-radius: var(--radius-blob);
+  }
+  .role-item:first-child::before {
+    background: var(--color-accent);
+  }
+  .role-item h3 {
+    font-size: var(--text-xl);
+    margin-top: var(--space-1);
+  }
+  .at {
+    color: var(--color-fg-muted);
+    font-weight: 400;
+  }
+  .summary {
+    margin-top: var(--space-2);
+    color: var(--color-fg-muted);
+  }
+  .highlights {
+    margin-top: var(--space-2);
+    padding-left: var(--space-6);
+  }
+  .skills {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--space-6);
+  }
+  dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-fg-muted);
+    margin-bottom: var(--space-2);
+  }
+  dd ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  dd li {
+    padding: 0.2em 0.75em;
+    border: 1.5px solid var(--color-fg);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-sm);
+    background: var(--color-surface);
+  }
+  .projects {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: var(--space-6);
+  }
+  .project {
+    padding: var(--space-6);
+    border: var(--border-width) solid var(--color-fg);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sticker);
+  }
+  .project h3 {
+    font-size: var(--text-lg);
+  }
+  .project h3 a {
+    color: var(--color-fg);
+  }
+  .project p {
+    margin-top: var(--space-2);
+    color: var(--color-fg-muted);
+  }
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+  .repo {
+    margin-left: auto;
+    font-size: var(--text-sm);
+  }
+  .print-hint {
+    margin-top: var(--space-16);
+  }
+  .print-btn {
+    min-height: 40px;
+    padding: var(--space-2) var(--space-4);
+    background: transparent;
+    border: 1.5px dashed var(--color-fg-muted);
+    border-radius: var(--radius-pill);
+    color: var(--color-fg-muted);
+    cursor: pointer;
+    font-size: var(--text-sm);
+  }
+  .print-btn:hover {
+    border-color: var(--color-fg);
+    color: var(--color-fg);
+  }
+
+  /* Resume-style print */
+  @media print {
+    :global(.site-header),
+    :global(.site-footer),
+    :global(.skip-link),
+    .avatar,
+    .print-hint {
+      display: none !important;
+    }
+    :global(:root),
+    :global(:root[data-theme]) {
+      --color-bg: #fff;
+      --color-surface: #fff;
+      --color-fg: #000;
+      --color-fg-muted: #333;
+      --color-accent: #000;
+      --color-spot: #000;
+      --color-pink-soft: #fff;
+      --shadow-sticker: none;
+      font-size: 11pt;
+    }
+    .about {
+      padding: 0;
+      max-width: none;
+    }
+    section {
+      margin-top: 1.5rem;
+      break-inside: avoid-page;
+    }
+    h1 {
+      font-size: 2rem;
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .role-item,
+    .project {
+      break-inside: avoid;
+    }
+    .print-url {
+      display: inline;
+      color: #333;
+    }
+    a {
+      color: #000;
+      text-decoration: none;
+    }
+  }
+</style>

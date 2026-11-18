@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/ui/PostList.astro';
+import { getPosts, getTags, tagSlug } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  const tags = await getTags();
+  return tags.map(({ tag }) => ({
+    params: { tag: tagSlug(tag) },
+    props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)) },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`#${tag}`} description={`Posts tagged “${tag}”.`}>
+  <section class="container page">
+    <header class="head">
+      <p class="eyebrow">
+        <a href="/blog">Writing</a> / Tag
+      </p>
+      <h1>#{tag}</h1>
+      <p class="lede">
+        {posts.length} {posts.length === 1 ? 'post' : 'posts'}
+      </p>
+    </header>
+    <PostList posts={posts} />
+  </section>
+</BaseLayout>
+
+<style>
+  .page {
+    max-width: 56rem;
+    padding-block: var(--space-16);
+  }
+  .head {
+    margin-bottom: var(--space-12);
+  }
+  .eyebrow a {
+    color: var(--color-fg-muted);
+  }
+  h1 {
+    margin-top: var(--space-2);
+    font-size: var(--text-3xl);
+    font-weight: 800;
+  }
+  .lede {
+    margin-top: var(--space-2);
+    color: var(--color-fg-muted);
+  }
+</style>

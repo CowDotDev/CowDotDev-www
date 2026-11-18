@@ -1,0 +1,188 @@
+---
+import '../styles/prose.css';
+import { Image } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import Spots from '../components/brand/Spots.astro';
+import Tag from '../components/ui/Tag.astro';
+import { formatDate, readingTime, tagSlug, type Post } from '../lib/posts';
+
+interface Props {
+  post: Post;
+  prev?: Post;
+  next?: Post;
+}
+const { post, prev, next } = Astro.props;
+const { title, description, pubDate, updatedDate, tags, heroImage, heroAlt, draft } = post.data;
+// Stable spot pattern per post
+const seed = [...post.id].reduce((n, c) => n + c.charCodeAt(0), 0);
+---
+
+<BaseLayout title={title} description={description} type="article">
+  <Fragment slot="head">
+    <meta property="article:published_time" content={pubDate.toISOString()} />
+    {updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />}
+    {tags.map((t) => (
+      <meta property="article:tag" content={t} />
+    ))}
+  </Fragment>
+
+  <article class="post container">
+    <header class="post-head">
+      <Spots
+        class="head-spots"
+        seed={seed}
+        count={6}
+        width={900}
+        height={120}
+        minSize={0.28}
+        maxSize={0.42}
+      />
+      <p class="eyebrow meta">
+        <a href="/blog">Writing</a>
+        <span aria-hidden="true">/</span>
+        <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+        <span aria-hidden="true">·</span>
+        <span>{readingTime(post.body)}</span>
+        {draft && <span class="draft">draft</span>}
+      </p>
+      <h1>{title}</h1>
+      <p class="desc">{description}</p>
+      {updatedDate && (
+        <p class="updated">
+          Updated <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
+        </p>
+      )}
+      {tags.length > 0 && (
+        <div class="tags">
+          {tags.map((t) => (
+            <Tag tag={t} href={`/tags/${tagSlug(t)}`} />
+          ))}
+        </div>
+      )}
+    </header>
+
+    {heroImage && (
+      <Image
+        class="hero-img"
+        src={heroImage}
+        alt={heroAlt ?? ''}
+        widths={[720, 1200]}
+        sizes="(min-width: 52rem) 48rem, 100vw"
+      />
+    )}
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    {(prev || next) && (
+      <nav class="pager" aria-label="More posts">
+        {next ? (
+          <a class="pager-link" href={`/blog/${next.id}`} rel="next">
+            <span class="eyebrow">← Newer</span>
+            <span class="pager-title">{next.data.title}</span>
+          </a>
+        ) : (
+          <span />
+        )}
+        {prev && (
+          <a class="pager-link older" href={`/blog/${prev.id}`} rel="prev">
+            <span class="eyebrow">Older →</span>
+            <span class="pager-title">{prev.data.title}</span>
+          </a>
+        )}
+      </nav>
+    )}
+  </article>
+</BaseLayout>
+
+<style>
+  .post {
+    max-width: 48rem;
+    padding-block: var(--space-12) 0;
+  }
+  .post-head {
+    margin-bottom: var(--space-12);
+  }
+  :global(.head-spots) {
+    width: 100%;
+    height: 56px;
+    margin-bottom: var(--space-8);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+  }
+  .meta a {
+    color: var(--color-fg-muted);
+  }
+  h1 {
+    margin-top: var(--space-4);
+    font-size: var(--text-3xl);
+    font-weight: 800;
+  }
+  .desc {
+    margin-top: var(--space-4);
+    font-size: var(--text-lg);
+    color: var(--color-fg-muted);
+  }
+  .updated {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-fg-muted);
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-6);
+  }
+  .draft {
+    padding: 0.1em 0.5em;
+    border-radius: var(--radius-sm);
+    background: var(--color-warning);
+    color: var(--ink);
+  }
+  :global(.hero-img) {
+    width: 100%;
+    margin-bottom: var(--space-12);
+    border: var(--border-width) solid var(--color-fg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sticker);
+  }
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    margin-top: var(--space-16);
+    padding-top: var(--space-8);
+    border-top: var(--border-width) solid var(--color-fg);
+  }
+  .pager-link {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    color: var(--color-fg);
+    text-decoration: none;
+  }
+  .pager-link:hover {
+    background: var(--color-accent-soft);
+    color: var(--color-fg);
+  }
+  .older {
+    text-align: right;
+  }
+  .pager-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-lg);
+  }
+  @media (max-width: 40rem) {
+    .pager {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
